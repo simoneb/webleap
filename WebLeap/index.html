@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<!------------------------------------------------------------------------------
+| Copyright (C) 2012-2013 Leap Motion, Inc. All rights reserved.               |
+| Leap Motion proprietary and confidential. Not for distribution.              |
+| Use subject to the terms of the Leap Motion SDK Agreement available at       |
+| https://developer.leapmotion.com/sdk_agreement, or another agreement         |
+| between Leap Motion and you, your company or other organization.             |
+------------------------------------------------------------------------------->
+<html>
+<head>
+    <title>Leap JavaScript API</title>
+    <script>
+        var leapWs, serverWs, open = false;
+
+        if ((typeof (WebSocket) == 'undefined') &&
+            (typeof (MozWebSocket) != 'undefined')) {
+            WebSocket = MozWebSocket;
+        }
+        
+        function strencode(data) {
+            return unescape(encodeURIComponent(JSON.stringify(data, null, 2)));
+        }
+
+        function strdecode(data) {
+            return JSON.parse(decodeURIComponent(escape(data)));
+        }
+
+        function init() {
+            serverWs = new WebSocket("ws://localhost:32166/webleap");
+            leapWs = new WebSocket("ws://localhost:6437/");
+            
+            serverWs.onopen = function (event) {
+                document.getElementById("serverConnection").innerHTML = "WebSocket server connection open!";
+                open = true;
+            };
+            
+            leapWs.onopen = function (event) {
+                document.getElementById("leapConnection").innerHTML = "WebSocket leap connection open!";
+            };
+            
+            serverWs.onmessage = function (event) {
+                var obj = JSON.parse(event.data);
+                var str = JSON.stringify(obj, undefined, 2);
+                document.getElementById("serverOutput").innerHTML = '<pre>' + str + '</pre>';
+            };
+            
+            leapWs.onmessage = function (event) {
+                var obj = JSON.parse(event.data);
+                var str = JSON.stringify(obj, undefined, 2);
+                
+                document.getElementById("leapOutput").innerHTML = '<pre>' + str + '</pre>';
+
+                open && serverWs && serverWs.send(event.data);
+            };
+
+            serverWs.onclose = function(event) {
+                serverWs = null;
+                document.getElementById("serverConnection").innerHTML = "WebSocket server connection closed";
+            };
+
+            leapWs.onclose = function(event) {
+                leapWs = null;
+                document.getElementById("leapConnection").innerHTML = "WebSocket leap connection closed";
+            };
+
+            serverWs.onerror = function (event) {
+                console.log("server error");
+            };
+            
+            leapWs.onerror = function (event) {
+                console.log("leap error");
+            };
+        }
+    </script>
+</head>
+<body onload="init();">
+    <h1>Leap JavaScript/WebSocket Sample</h1>
+    <div id="leapConnection">WebSocket leap not connected</div>
+    <div id="serverConnection">WebSocket server not connected</div>
+    <div style="float: left; width: 300px" >
+        <p>Server:</p>
+        <div id="serverOutput"></div>
+    </div>
+    <div style="float: left; width: 300px" >
+        <p>Leap:</p>
+        <div id="leapOutput"></div>
+    </div>
+</body>
+</html>

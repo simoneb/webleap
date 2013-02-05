@@ -1,0 +1,1 @@
+﻿Access for HTTPListener: netsh http add urlacl url=http://+:32165/ user=Everyone ## (or specific user)
