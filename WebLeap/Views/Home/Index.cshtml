@@ -1,7 +1,14 @@
-﻿@model dynamic
+﻿@using System.Configuration
+@using WebLeap
+@model dynamic
 
 @{
     ViewBag.Title = "title";
+}
+@section scripts
+{
+    <script src="~/Scripts/jquery.signalR-1.0.0-rc2.min.js"></script>
+    <script src="~/signalr/hubs"></script>    
 }
 <!DOCTYPE html>
 <!------------------------------------------------------------------------------
@@ -21,30 +28,23 @@
             (typeof (MozWebSocket) != 'undefined')) {
             WebSocket = MozWebSocket;
         }
-        
-        function strencode(data) {
-            return unescape(encodeURIComponent(JSON.stringify(data, null, 2)));
-        }
-
-        function strdecode(data) {
-            return JSON.parse(decodeURIComponent(escape(data)));
-        }
 
         function init() {
-            serverWs = new WebSocket("@ViewBag.WebSocketUrl");
+            var serverWs = $.connection.webleap;
+
             leapWs = new WebSocket("ws://localhost:6437/");
             
-            serverWs.onopen = function (event) {
+            $.connection.hub.start().done(function () {
                 document.getElementById("serverConnection").innerHTML = "WebSocket server connection open!";
                 open = true;
-            };
+            });
             
             leapWs.onopen = function (event) {
                 document.getElementById("leapConnection").innerHTML = "WebSocket leap connection open!";
             };
             
-            serverWs.onmessage = function (event) {
-                var obj = JSON.parse(event.data);
+            serverWs.client.coordinates = function (message) {
+                var obj = JSON.parse(message);
                 var str = JSON.stringify(obj, undefined, 2);
                 document.getElementById("serverOutput").innerHTML = '<pre>' + str + '</pre>';
             };
@@ -55,22 +55,22 @@
                 
                 document.getElementById("leapOutput").innerHTML = '<pre>' + str + '</pre>';
 
-                open && serverWs && serverWs.send(event.data);
+                open && serverWs && serverWs.server.coordinates(event.data);
             };
 
-            serverWs.onclose = function(event) {
-                serverWs = null;
-                document.getElementById("serverConnection").innerHTML = "WebSocket server connection closed";
-            };
+            //serverWs.bind(XSockets.Events.close, function (message) {
+            //    serverWs = null;
+            //    document.getElementById("serverConnection").innerHTML = "WebSocket server connection closed";
+            //});
 
             leapWs.onclose = function(event) {
                 leapWs = null;
                 document.getElementById("leapConnection").innerHTML = "WebSocket leap connection closed";
             };
 
-            serverWs.onerror = function (event) {
-                console.log("server error");
-            };
+            //serverWs.bind(XSockets.Events.onError, function (error) {
+            //    console.log("server error");
+            //});
             
             leapWs.onerror = function (event) {
                 console.log("leap error");
