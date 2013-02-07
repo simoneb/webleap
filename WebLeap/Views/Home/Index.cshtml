@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "title";
+}
+<!DOCTYPE html>
 <!------------------------------------------------------------------------------
 | Copyright (C) 2012-2013 Leap Motion, Inc. All rights reserved.               |
 | Leap Motion proprietary and confidential. Not for distribution.              |
@@ -26,7 +31,7 @@
         }
 
         function init() {
-            serverWs = new WebSocket("ws://localhost:32166/webleap");
+            serverWs = new WebSocket("@ViewBag.WebSocketUrl");
             leapWs = new WebSocket("ws://localhost:6437/");
             
             serverWs.onopen = function (event) {
@@ -87,3 +92,4 @@
     </div>
 </body>
 </html>
+
