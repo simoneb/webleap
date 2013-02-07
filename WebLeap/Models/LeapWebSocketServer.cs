@@ -11,7 +11,7 @@ namespace WebLeap.Models
 
 		public static WebSocketServer Start(string host)
 		{
-			var server = new WebSocketServer(new UriBuilder("ws", host, 32165, "webleap").Uri.ToString());
+			var server = new WebSocketServer(new UriBuilder("ws", host, 8081, "webleap").Uri.ToString());
 
 			server.Start(AcceptClient);
 
