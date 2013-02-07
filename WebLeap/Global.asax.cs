@@ -30,9 +30,9 @@ namespace WebLeap
 
 		protected void Application_BeginRequest()
 		{
-			Interlocked.CompareExchange(ref _webSocketServerLazy,
-			                            new Lazy<WebSocketServer>(() => LeapWebSocketServer.Start(Request.Url.Host)),
-			                            null);
+			//Interlocked.CompareExchange(ref _webSocketServerLazy,
+			//							new Lazy<WebSocketServer>(() => LeapWebSocketServer.Start(Request.Url.Host)),
+			//							null);
 		}
 
 		protected void Application_End()

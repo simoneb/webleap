@@ -10,7 +10,7 @@ namespace WebLeap.Controllers
     {
         public ActionResult Index()
         {
-	        ViewBag.WebSocketUrl = MvcApplication.WebSocketServer.Location;
+			//ViewBag.WebSocketUrl = MvcApplication.WebSocketServer.Location;
             return View();
         }
 
